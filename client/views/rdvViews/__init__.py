@@ -1,0 +1,6 @@
+from .reserver_rdv_client_view import ReserverRdvClientView
+from .modifier_rdv_client_view import ModifierRdvClientView
+from .annuler_rdv_client_view import AnnulerRdvClientView
+from .afficher_rdv_absent_present_client_view import AfficherHistoriqueRdvClientView
+from .afficher_rdvs_actifs_client_view import AfficherRdvsActifsClientView
+from .disponibilites_service_view import DisponibilitesServiceView

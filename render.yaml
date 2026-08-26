@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: toorrii-backend
+    runtime: python
+    plan: free
+    buildCommand: "bash build.sh"
+    startCommand: "gunicorn toorriiBackend.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: PYTHON_VERSION
+        value: "3.13.0"
+      - key: DB_NAME
+        fromDatabase:
+          name: toorrii-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: toorrii-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: toorrii-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: toorrii-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: toorrii-db
+          property: port
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: FACEBOOK_APP_ID
+        sync: false
+      - key: FACEBOOK_APP_SECRET
+        sync: false
+      - key: BREVO_API_KEY
+        sync: false
+      - key: DEFAULT_FROM_EMAIL
+        sync: false
+      - key: DEFAULT_FROM_NAME
+        sync: false
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+      - key: CSRF_TRUSTED_ORIGINS
+        sync: false
+
+databases:
+  - name: toorrii-db
+    plan: free

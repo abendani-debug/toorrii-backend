@@ -1,0 +1,6 @@
+from .afficher_service_professionnel_view import AfficherServiceProfessionnelView
+from .ajouter_service_view import AjouterServiceView
+from .afficher_service_detail_view import AfficherServiceDetailView
+from .modifier_service_view import ModifierServiceView
+from .suspendre_service_view import SuspendreServiceView
+from .supprimer_service_view import SupprimerServiceView

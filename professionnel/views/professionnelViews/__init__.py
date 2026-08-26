@@ -1,0 +1,3 @@
+from .professionnel_modifier_compte_view import ProfessionnelModifierCompteView
+from .professionnel_detail_compte_view import ProfessionnelDetailCompteView
+from .professionnel_demande_desactivation_compte_view import ProfessionnelDemandeDesactivationCompteView

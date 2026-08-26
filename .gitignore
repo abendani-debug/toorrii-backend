@@ -1,0 +1,14 @@
+.env
+toorrii-env/
+assets/
+media/
+db.sqlite3
+staticfiles/
+
+# Ignorer le cache Python (mais garder les fichiers de migration *.py)
+*/migrations/*.pyc
+*/migrations/__pycache__/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd

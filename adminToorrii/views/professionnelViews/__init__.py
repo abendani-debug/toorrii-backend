@@ -1,0 +1,7 @@
+from .afficher_professionnel_view import AfficherProfessionnelView
+from .afficher_professionnel_detail_view import ProfessionnelDetailView
+from .ajouter_professionnel_view import AjouterProfessionnelView
+from .supprimer_professionnel_view import SupprimerProfessionnelView
+from .modifier_professionnel_view import ModifierProfessionnelView
+from .activer_professionnel_view import ActiverProfessionnelView
+from .desactiver_professionnel_view import DesactiverProfessionnelView

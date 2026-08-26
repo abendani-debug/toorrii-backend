@@ -1,0 +1,4 @@
+from .admin_login_view import AdminLoginView
+from .admin_logout_view import LogoutView
+from .admin_professionnel_reset_password_verify_view import AdminResetPasswordVerifyView
+from .admin_reset_password_request_view import AdminResetPasswordRequestView

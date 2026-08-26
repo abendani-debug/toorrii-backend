@@ -1,0 +1,2 @@
+from .afficher_profile_client_view import AfficherProfileClientView
+from .modifier_profile_client_view import ModifierProfileClientView

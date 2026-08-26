@@ -1,0 +1,2 @@
+from .ajouter_politique_confidentialite_view import AjouterPolitiqueView
+from .modifier_politique_confidentialite_view import ModifierPolitiqueView

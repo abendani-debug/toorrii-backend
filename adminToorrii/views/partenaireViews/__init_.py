@@ -1,0 +1,3 @@
+from .ajouter_partenaire_view import AjouterPartenaireView
+from .modifier_partenaire_view import ModifierPartenaireView
+from .supprimer_partenaire_view import SupprimerPartenaireView

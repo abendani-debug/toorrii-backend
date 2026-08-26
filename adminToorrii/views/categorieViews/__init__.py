@@ -1,0 +1,7 @@
+from .afficher_categorie_view import AfficherCategoriesView
+from .ajouter_categorie_view import AjouterCategorieView
+from .modifier_categorie_view import ModifierCategorieView
+from .suspendre_categorie_view import SuspendreCategorieView
+from .supprimer_categorie_view import SupprimerCategorieView
+from .afficher_categorie_detail_view import AfficherCategoriesDetailView
+from .afficher_enfants_categorie_view import AfficherEnfantsCategorieView

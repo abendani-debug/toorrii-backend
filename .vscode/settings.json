@@ -1,0 +1,8 @@
+{
+    "editor.quickSuggestions": {
+        "comments": "inline",
+        "strings": "inline",
+        "other": "inline"
+    },
+    "git.ignoreLimitWarning": true
+}
