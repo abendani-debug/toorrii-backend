@@ -107,6 +107,9 @@ class Professionnel(models.Model):
     class Meta:
         verbose_name = "Professionnel"
         verbose_name_plural = "Professionnels"
+        indexes = [
+            models.Index(fields=['etat_compte']),
+        ]
 
     def __str__(self):
         return self.nom_entreprise

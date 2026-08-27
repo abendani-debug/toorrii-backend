@@ -42,10 +42,10 @@ class ListeProfessionnelsParCategorieView(APIView):
         qs_pre = Professionnel.objects.filter(
             services__categorie__categorie_id=categorie_id,
             etat_compte=Professionnel.EtatCompte.PRE_INSCRIT,
-        ).distinct()
+        ).select_related("lead_origine").distinct()[:200]
 
         # Si pas de services liés, chercher via le lead lié à la catégorie
-        if not qs_pre.exists():
+        if not qs_pre:
             lead_pro_ids = ProfessionnelLead.objects.filter(
                 categorie_id=categorie_id,
                 professionnel__isnull=False,
@@ -54,10 +54,10 @@ class ListeProfessionnelsParCategorieView(APIView):
             qs_pre = Professionnel.objects.filter(
                 professionnel_id__in=lead_pro_ids,
                 etat_compte=Professionnel.EtatCompte.PRE_INSCRIT,
-            )
+            ).select_related("lead_origine")[:200]
 
         for pro in qs_pre:
-            lead = ProfessionnelLead.objects.filter(professionnel=pro).first()
+            lead = getattr(pro, "lead_origine", None)
             results.append({
                 "type":       "reference",
                 "lead_id":    lead.lead_id if lead else pro.professionnel_id,

@@ -171,7 +171,7 @@ class Command(BaseCommand):
                     break
                 page += 1
 
-        self.stdout.write("\n" + "─" * 60)
+        self.stdout.write(self._safe("\n" + "─" * 60))
         self.stdout.write(self.style.SUCCESS(f"OK  Termine -- {total_crees} crees, {total_ignores} deja presents"))
 
     # ── Helpers ───────────────────────────────────────────────────────────────

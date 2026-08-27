@@ -61,6 +61,11 @@ class ProfessionnelLead(models.Model):
         verbose_name        = "Lead Professionnel"
         verbose_name_plural = "Leads Professionnels"
         ordering            = ['-date_ajout']
+        indexes = [
+            models.Index(fields=['wilaya']),
+            models.Index(fields=['statut']),
+            models.Index(fields=['wilaya', 'statut']),
+        ]
 
     def __str__(self):
         return f"{self.nom} — {self.specialite} ({self.wilaya})"

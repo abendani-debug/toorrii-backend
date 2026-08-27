@@ -21,6 +21,8 @@ class RechercherProfessionnelParWilayaView(APIView):
         parameters=[
             OpenApiParameter(name="wilaya", description="Nom de la wilaya (ex: Oran)", required=True, type=str),
             OpenApiParameter(name="specialite", description="Filtrer par spécialité (ex: Cardiologue)", required=False, type=str),
+            OpenApiParameter(name="page", type=int, required=False, description="Numéro de page pour les leads (défaut=1)"),
+            OpenApiParameter(name="page_size", type=int, required=False, description="Taille de page pour les leads (défaut=50, max=200)"),
         ],
         responses={
             200: OpenApiResponse(description="Liste des professionnels trouvés"),
@@ -38,17 +40,24 @@ class RechercherProfessionnelParWilayaView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+        try:
+            page      = max(1, int(request.query_params.get("page", 1)))
+            page_size = min(200, max(1, int(request.query_params.get("page_size", 50))))
+        except (ValueError, TypeError):
+            page, page_size = 1, 50
+
         wilaya_upper = wilaya.upper()
         results = []
 
-        # ── 1. Pros inscrits ──────────────────────────────────────────────────
-        qs_inscrits = Professionnel.objects.filter(
-            wilaya__contains=[wilaya_upper],
-            etat_compte=Professionnel.EtatCompte.ACTIVE
-        )
-        serializer = ProfessionnelFullSerializer(qs_inscrits, many=True)
-        for item in serializer.data:
-            results.append({**item, "type": "inscrit"})
+        # ── 1. Pros inscrits (toujours sur la 1ère page uniquement) ─────────
+        if page == 1:
+            qs_inscrits = Professionnel.objects.filter(
+                wilaya__contains=[wilaya_upper],
+                etat_compte=Professionnel.EtatCompte.ACTIVE
+            )
+            serializer = ProfessionnelFullSerializer(qs_inscrits, many=True)
+            for item in serializer.data:
+                results.append({**item, "type": "inscrit"})
 
         # ── 2. Pros pré-inscrits (issus du scraping, via leur lead) ─────────
         lead_qs = ProfessionnelLead.objects.filter(
@@ -66,6 +75,22 @@ class RechercherProfessionnelParWilayaView(APIView):
         if specialite:
             lead_qs     = lead_qs.filter(specialite__icontains=specialite)
             raw_lead_qs = raw_lead_qs.filter(specialite__icontains=specialite)
+
+        # ── Pagination des leads (potentiellement volumineux) ───────────────
+        # lead_qs et raw_lead_qs sont paginés comme une seule liste continue,
+        # sans les matérialiser entièrement en mémoire.
+        total_leads = lead_qs.count() + raw_lead_qs.count()
+        offset = (page - 1) * page_size
+
+        n_leads = lead_qs.count()
+        if offset < n_leads:
+            lead_qs     = lead_qs[offset: offset + page_size]
+            remaining   = page_size - (min(offset + page_size, n_leads) - offset)
+            raw_lead_qs = raw_lead_qs[:remaining] if remaining > 0 else raw_lead_qs.none()
+        else:
+            raw_offset  = offset - n_leads
+            lead_qs     = lead_qs.none()
+            raw_lead_qs = raw_lead_qs[raw_offset: raw_offset + page_size]
 
         for lead in lead_qs:
             pro = lead.professionnel
@@ -100,4 +125,14 @@ class RechercherProfessionnelParWilayaView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        return Response({"count": len(results), "results": results}, status=status.HTTP_200_OK)
+        return Response(
+            {
+                "count":        len(results),
+                "total_leads":  total_leads,
+                "page":         page,
+                "page_size":    page_size,
+                "total_pages":  max(1, -(-total_leads // page_size)),
+                "results":      results,
+            },
+            status=status.HTTP_200_OK,
+        )
