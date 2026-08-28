@@ -70,6 +70,25 @@ class ListeProfessionnelsParCategorieView(APIView):
                 "longitude":  lead.longitude if lead else None,
             })
 
+        # ── 3. Leads bruts, jamais convertis en Professionnel ────────────────
+        raw_leads = ProfessionnelLead.objects.filter(
+            categorie_id=categorie_id,
+            professionnel__isnull=True,
+        ).exclude(statut=ProfessionnelLead.StatutLead.REFUSE)[:200]
+
+        for lead in raw_leads:
+            results.append({
+                "type":       "reference",
+                "lead_id":    lead.lead_id,
+                "nom":        lead.nom,
+                "specialite": lead.specialite,
+                "telephone":  lead.telephone,
+                "adresse":    lead.adresse,
+                "wilaya":     lead.wilaya,
+                "latitude":   lead.latitude,
+                "longitude":  lead.longitude,
+            })
+
         if not results:
             return Response(
                 {"message": "Aucun professionnel trouvé pour cette catégorie"},
