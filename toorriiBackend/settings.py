@@ -124,6 +124,9 @@ FACEBOOK_APP_SECRET = config('FACEBOOK_APP_SECRET')
 CSRF_COOKIE_NAME = "csrftoken"
 CSRF_COOKIE_HTTPONLY = False      # accessible par JS
 CSRF_COOKIE_SECURE = config("CSRF_COOKIE_SECURE", cast=bool, default=True)
+# Frontend (Vercel) et backend (Render) sont sur des domaines différents :
+# le cookie doit pouvoir être renvoyé sur une requête cross-site.
+CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
 CSRF_TRUSTED_ORIGINS = config(
     "CSRF_TRUSTED_ORIGINS",
     default="http://localhost:5173,http://127.0.0.1:5173",

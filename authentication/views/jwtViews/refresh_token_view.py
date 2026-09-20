@@ -243,7 +243,7 @@ class RefreshAccessTokenView(APIView):
             value=str(new_refresh),
             httponly=True,
             secure=not settings.DEBUG,  # OK en dev et prod
-            samesite="Strict",
+            samesite="None" if not settings.DEBUG else "Lax",
             max_age=30 * 24 * 60 * 60
         )
 

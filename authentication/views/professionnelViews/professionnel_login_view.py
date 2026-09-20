@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
-from django.middleware.csrf import get_token, rotate_token
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 from adminToorrii.models import Professionnel, Utilisateur
 from authentication.utils.token import get_tokens_for_user_professionnel
@@ -104,10 +103,6 @@ class ProfessionnelLoginView(APIView):
         access_token = tokens["access"]
         refresh_token = tokens["refresh"]
 
-        # Rotation CSRF
-        rotate_token(request)
-        new_csrf_token = get_token(request)
-
         # Réponse
         response = Response({
             "professionnel_id": professionnel.professionnel_id,
@@ -116,22 +111,15 @@ class ProfessionnelLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
         # Cookie refresh token (HttpOnly)
+        # SameSite=None : le frontend (Vercel) et le backend (Render) sont
+        # sur des domaines différents, le cookie doit pouvoir circuler cross-site.
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             httponly=True,
             secure=True,
-            samesite='Strict',
+            samesite='None',
             max_age=30*24*60*60
-        )
-
-        # Cookie CSRF
-        response.set_cookie(
-            key="csrftoken",
-            value=new_csrf_token,
-            httponly=False,
-            secure=False,
-            samesite='Strict',
         )
 
         return response

@@ -7,7 +7,6 @@ from authentication.serializers import LoginSerializer, AdminLoginResponseSerial
 from adminToorrii.models import AdminUser, Utilisateur
 from authentication.utils.token import get_tokens_for_user_admin
 from django.contrib.auth import authenticate
-from django.middleware.csrf import get_token, rotate_token
 
 
 class AdminLoginView(APIView):
@@ -169,10 +168,6 @@ class AdminLoginView(APIView):
         access_token = tokens["access"]
         refresh_token = tokens["refresh"]
 
-        #  Rotation CSRF
-        rotate_token(request)
-        new_csrf_token = get_token(request)
-
         #  Réponse
         response = Response({
             "admin_id": admin_user.admin_id,
@@ -182,22 +177,15 @@ class AdminLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
         #  Cookie refresh token (HttpOnly)
+        # SameSite=None : le frontend (Vercel) et le backend (Render) sont
+        # sur des domaines différents, le cookie doit pouvoir circuler cross-site.
         response.set_cookie(
             key="refresh_token",
             value=refresh_token,
             httponly=True,
             secure=True,
-            samesite='Strict',
+            samesite='None',
             max_age=30*24*60*60
-        )
-
-        #  Cookie CSRF
-        response.set_cookie(
-            key="csrftoken",
-            value=new_csrf_token,
-            httponly=False,
-            secure=False,
-            samesite='Strict',
         )
 
         return response

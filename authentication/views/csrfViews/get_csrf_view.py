@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.middleware.csrf import get_token
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -42,17 +43,20 @@ class GetCSRFToken(APIView):
     def get(self, request):
         csrf_token = get_token(request)
 
+        # Le cookie n'est pas lisible en JS par un frontend sur un autre domaine
+        # (Vercel <-> Render) : le token est donc aussi renvoyé dans le corps JSON
+        # pour que le frontend puisse l'utiliser comme header X-CSRFToken.
         response = Response(
-            {"detail": "CSRF cookie set"},
+            {"detail": "CSRF cookie set", "csrfToken": csrf_token},
             status=status.HTTP_200_OK
         )
 
         response.set_cookie(
             key="csrftoken",
             value=csrf_token,
-            secure=True,
+            secure=settings.CSRF_COOKIE_SECURE,
             httponly=False,  # accessible JS
-            samesite="Strict",
+            samesite=settings.CSRF_COOKIE_SAMESITE,
             max_age=30 * 24 * 60 * 60
         )
 
